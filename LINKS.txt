@@ -1,2 +1,5 @@
 http://simbad.u-strasbg.fr/simbad/
 http://www.strudel.org.uk/lookUP/
+
+https://rhodesmill.org/skyfield/api-position.html
+https://docs.astropy.org/en/stable/coordinates/
