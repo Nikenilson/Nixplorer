@@ -66,7 +66,21 @@ public class MainActivity extends AppCompatActivity
         img14 = findViewById(R.id.img14);
         img15 = findViewById(R.id.img15);
 
-        img1.setImageResource("");
+        img1.setImageResource(R.drawable.a);
+        img2.setImageResource(R.drawable.b);
+        img3.setImageResource(R.drawable.c);
+        img4.setImageResource(R.drawable.a);
+        img5.setImageResource(R.drawable.b);
+        img6.setImageResource(R.drawable.c);
+        img7.setImageResource(R.drawable.a);
+        img8.setImageResource(R.drawable.b);
+        img9.setImageResource(R.drawable.c);
+        img10.setImageResource(R.drawable.a);
+        img11.setImageResource(R.drawable.b);
+        img12.setImageResource(R.drawable.c);
+        img13.setImageResource(R.drawable.a);
+        img14.setImageResource(R.drawable.b);
+        img15.setImageResource(R.drawable.c);
     }
 
     @Override
@@ -107,18 +121,12 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
+        if (id == R.id.nav_controlTel) {
             Intent intent = new Intent(MainActivity.this, ControlesActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_tools) {
-
-        } else if (id == R.id.nav_share) {
-
         } else if (id == R.id.nav_send) {
+
+        } else if (id == R.id.nav_share){
 
         }
 
