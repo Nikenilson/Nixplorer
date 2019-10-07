@@ -1,0 +1,4 @@
+https://www.instructables.com/id/Control-Your-Telescope-Using-Stellarium-Arduino/
+https://www.stellarium-labs.com/forums/topic/telescope-control/
+https://www.youtube.com/watch?v=DUdYv311HFw
+http://priede.bf.lu.lv/ftp/pub/TIS/astronomija/Stellarium/stellarium_user_guide-0.18.0-1.pdf
