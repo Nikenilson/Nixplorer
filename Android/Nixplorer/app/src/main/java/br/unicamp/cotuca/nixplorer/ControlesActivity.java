@@ -26,8 +26,13 @@ public class ControlesActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivityForResult(myIntent, 0);
+        int id = item.getItemId();
+        if(id != R.id.action_info)
+        {
+            Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivityForResult(myIntent, 0);
+            return true;
+        }
         return true;
     }
 }

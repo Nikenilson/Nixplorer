@@ -2,13 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="Configurações"
-        android:icon="@drawable/ic_build_black_24dp"
-        app:showAsAction="always"/>
-
-    <item
         android:id="@+id/action_info"
         android:icon="@drawable/ic_info_outline_white_24dp"
         android:title="Informações"
