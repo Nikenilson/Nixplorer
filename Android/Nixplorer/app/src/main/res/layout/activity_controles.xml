@@ -42,7 +42,7 @@
                     android:orientation="horizontal">
 
                     <EditText
-                        android:id="@+id/edIp"
+                        android:id="@+id/edtIp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="25dp"
@@ -64,7 +64,7 @@
                     android:orientation="horizontal">
 
                     <EditText
-                        android:id="@+id/edPorta"
+                        android:id="@+id/edtPorta"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="25dp"
@@ -148,6 +148,7 @@
                     android:layout_margin="5dp"/>
 
                 <Button
+                    android:id="@+id/btnAjustar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ajustar"/>
