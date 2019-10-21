@@ -1,4 +1,4 @@
-package nixplorer.main.nixplorer;
+package br.unicamp.cotuca.nixplorer;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("nixplorer.main.nixplorer", appContext.getPackageName());
+        assertEquals("br.unicamp.cotuca.nixplorer", appContext.getPackageName());
     }
 }

@@ -9,10 +9,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,7 +25,6 @@ import java.net.UnknownHostException;
 public class ControlesActivity extends AppCompatActivity {
     Button btnAjustar, btnConectar, btnDesconectar;
     EditText edtIp, edtPorta;
-    Spinner spPlanetas;
 
     private Socket socket = null;
 
@@ -46,21 +43,11 @@ public class ControlesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_controles);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        spPlanetas = findViewById(R.id.spPlanetas);
         btnAjustar = findViewById(R.id.btnAjustar);
         btnConectar = findViewById(R.id.btnConectar);
         btnDesconectar = findViewById(R.id.btnDesconectar);
         edtIp = findViewById(R.id.edtIp);
         edtPorta = findViewById(R.id.edtPorta);
-
-        String[] arraySpinner = new String[] {
-                "Jupiter","Lua"
-        };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spPlanetas.setAdapter(adapter);
 
         btnConectar.setOnClickListener(new View.OnClickListener() {
             @Override

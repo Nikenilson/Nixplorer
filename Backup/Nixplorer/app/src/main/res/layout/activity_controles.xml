@@ -142,7 +142,7 @@
                     android:textSize="24dp"/>
 
                 <Spinner
-                    android:id="@+id/spPlanetas"
+                    android:id="@+id/planets_spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"/>

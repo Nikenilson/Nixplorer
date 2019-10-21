@@ -1,4 +1,4 @@
-package nixplorer.main.nixplorer;
+package br.unicamp.cotuca.nixplorer;
 
 import org.junit.Test;
 
