@@ -1,0 +1,8 @@
+-Dec. is equivalent to north-south; RA is equivalent to east-west.
+
+-Since 360/24=15 1 hour of RA is 15 degrees.
+
+http://www.wikisky.org/?ra=17.0355556&de=0.1511111&zoom=5&show_box=1&box_ra=17.0355556&box_de=0.1511111&box_width=60&box_height=60&box_var_size=0&img_source=DSS2
+http://www.astrouw.edu.pl/~jskowron/ra-dec/?q=17h+28m+09.4s
+
+- https://www.instructables.com/id/Star-Track-Arduino-Powered-Star-Pointer-and-Tracke/
