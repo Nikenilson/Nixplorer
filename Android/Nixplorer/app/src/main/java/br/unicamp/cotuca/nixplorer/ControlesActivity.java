@@ -27,7 +27,7 @@ import java.net.UnknownHostException;
 public class ControlesActivity extends AppCompatActivity {
     Button btnAjustar, btnConectar, btnDesconectar;
     EditText edtIp, edtPorta;
-    Spinner spPlanetas;
+    Spinner spPlanetas, spGrausH, spGrausV;
 
     private Socket socket = null;
 
@@ -47,20 +47,32 @@ public class ControlesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         spPlanetas = findViewById(R.id.spPlanetas);
+        spGrausH = findViewById(R.id.spGrausH);
+        spGrausV = findViewById(R.id.spGrausV);
         btnAjustar = findViewById(R.id.btnAjustar);
         btnConectar = findViewById(R.id.btnConectar);
         btnDesconectar = findViewById(R.id.btnDesconectar);
         edtIp = findViewById(R.id.edtIp);
         edtPorta = findViewById(R.id.edtPorta);
 
-        String[] arraySpinner = new String[] {
-                "Jupiter","Lua"
-        };
+        String[] arraySpinnerPlanetas = new String[] { "Jupiter","Lua" };
+        String[] arraySpinnerGrausH = new String[] { "Graus","10º" };
+        String[] arraySpinnerGrausV = new String[] { "Graus","10º" };
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
+                android.R.layout.simple_spinner_item, arraySpinnerPlanetas);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, arraySpinnerGrausH);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, arraySpinnerGrausV);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spPlanetas.setAdapter(adapter);
+        spGrausH.setAdapter(adapter2);
+        spGrausV.setAdapter(adapter3);
 
         btnConectar.setOnClickListener(new View.OnClickListener() {
             @Override
