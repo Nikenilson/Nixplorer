@@ -109,7 +109,7 @@ public class ControlesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    val = "1";
+                    val = "090-090-1";
                     new Thread(new OutThread()).start();
 
                 } catch (Exception e) {

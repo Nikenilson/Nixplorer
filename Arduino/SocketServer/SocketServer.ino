@@ -10,7 +10,7 @@ char pass[] = "12345678";
 int status = WL_IDLE_STATUS;
 
 WiFiEspServer server(80);
-RingBuffer buf(8);
+char buf[10] = {0};
 
 void setup() {
   myStepper.setSpeed(1); //VELOCIDADE DO MOTOR
@@ -36,26 +36,30 @@ void loop() {
   WiFiEspClient client = server.available();
   if (client){
     Serial.println("Novo cliente");
-    buf.init();
-
+    int i = 0;
     while (client.connected()){
       if (client.available()){
         char c = client.read();
-        buf.push(c);
-        Serial.write(c);
-        if (buf.endsWith("\r\n\r\n")){
+        buf[i] = c;
+        if (strcmp("\r\n\r\n", buf) == 0){
           Serial.println("Fechando"); 
           break;
         }
 
-        if (buf.endsWith("1")){
-          efeito1();
-          buf.reset();
+        if (i == 9){
+          char delimiter = '-';
+          char* vet = strtok(buf, &delimiter);
+          Serial.println(vet[0]);
+          //efeito1();
+          //reset
+          i = 0;
+          Serial.println(buf);
           Serial.println(" Efeito 1");
         }
-        if (buf.endsWith("OFF")){
+        if (strcmp("OFF", buf) == 0){
           digitalWrite(13, LOW);
-          buf.reset();
+          //reset
+          i = 0;
           Serial.println(" Ligado");
         }
         
@@ -67,9 +71,10 @@ void loop() {
   }
 }
 
-void efeito1()
-{    
-  myStepper.step(512);
+void efeito1(int graus)
+{
+  int passos = graus*2048/360;
+  myStepper.step(passos);
 }
 
 
