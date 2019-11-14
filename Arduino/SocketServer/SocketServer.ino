@@ -13,7 +13,7 @@ WiFiEspServer server(80);
 RingBuffer buf(8);
 
 void setup() {
-  myStepper.setSpeed(300); //VELOCIDADE DO MOTOR
+  myStepper.setSpeed(1); //VELOCIDADE DO MOTOR
   
   Serial.begin(115200);  // porta de debug
   Serial1.begin(9600);
@@ -69,7 +69,7 @@ void loop() {
 
 void efeito1()
 {    
-  myStepper.step(64);
+  myStepper.step(512);
 }
 
 
