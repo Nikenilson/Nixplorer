@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +14,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,17 +41,16 @@ public class ControlesActivity extends AppCompatActivity {
     Button btnAjustar, btnConectar, btnDesconectar;
     EditText edtIp, edtPorta;
     Spinner spPlanetas, spGrausH, spGrausV;
+    TextView tvSaidaTeste;
 
     private Socket socket = null;
-
     private static int SERVERPORT = 80;
     private static String SERVER_IP = "192.168.0.92";
     boolean  isRunning = false;
-
     private PrintWriter out;
     private BufferedReader input;
-
     private String val = "ok";
+    RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +66,9 @@ public class ControlesActivity extends AppCompatActivity {
         btnDesconectar = findViewById(R.id.btnDesconectar);
         edtIp = findViewById(R.id.edtIp);
         edtPorta = findViewById(R.id.edtPorta);
+        tvSaidaTeste = findViewById(R.id.tvSaidaTeste);
 
-        String[] arraySpinnerPlanetas = new String[] { "Jupiter","Lua" };
+        String[] arraySpinnerPlanetas = new String[] { "Jupiter","Lua", "M42" };
         String[] arraySpinnerGrausH = new String[] { "Graus","10º" };
         String[] arraySpinnerGrausV = new String[] { "Graus","10º" };
 
@@ -105,18 +118,50 @@ public class ControlesActivity extends AppCompatActivity {
             }
         });
 
+        queue = Volley.newRequestQueue(this);
         btnAjustar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
+                getCoords(spPlanetas.getSelectedItem().toString());
+                String coords = tvSaidaTeste.getText().toString();
+                tvSaidaTeste.setText("");
+                Log.e("Mensagem: ", coords + " AQUI!");
+
+                /*String coordsVet[] = coords.split(" ");
+                tvSaidaTeste.setText(coordsVet[0]);*/
+                /*try {
                     val = "090-090-1";
                     new Thread(new OutThread()).start();
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
+    }
+
+    private void getCoords(String corpo)
+    {
+        tvSaidaTeste.setText("");
+        String url = "http://host-python.herokuapp.com/astropy/" + corpo;
+        StringRequest request = null;
+
+        try{
+            request = new StringRequest (Request.Method.GET, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    tvSaidaTeste.setText(response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+                }
+            });
+        }catch (Exception ex){
+            Log.e("Mensagem: ", ex.getMessage() + " AQUI!");
+        }
+        queue.add(request);
     }
 
     @Override
