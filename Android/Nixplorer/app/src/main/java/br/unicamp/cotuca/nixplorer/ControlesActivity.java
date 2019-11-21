@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.DecimalFormat;
 
 public class ControlesActivity extends AppCompatActivity {
     Button btnAjustar, btnConectar, btnDesconectar;
@@ -49,7 +50,7 @@ public class ControlesActivity extends AppCompatActivity {
     boolean  isRunning = false;
     private PrintWriter out;
     private BufferedReader input;
-    private String val = "ok";
+    private String val = "";
     RequestQueue queue;
 
     @Override
@@ -109,7 +110,7 @@ public class ControlesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    val = "\r\n\r\n";
+                    val = "\r\n";
                     new Thread(new OutThread()).start();
 
                 } catch (Exception e) {
@@ -122,25 +123,45 @@ public class ControlesActivity extends AppCompatActivity {
         btnAjustar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getCoords(spPlanetas.getSelectedItem().toString());
-                String coords = tvSaidaTeste.getText().toString();
-                tvSaidaTeste.setText("");
-                Log.e("Mensagem: ", coords + " AQUI!");
+                getCoords(spPlanetas.getSelectedItem().toString(), new VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        String coordsVet[] = result.split(" ");
+                        Integer c1 = Math.round(Float.parseFloat(coordsVet[0]));
+                        Integer c2 = Math.round(Float.parseFloat(coordsVet[1]));
+                        try {
+                            String ra = "", dec = "";
+                            Integer raI = (c1*2048)/360;
+                            Integer decI = (c2*2048)/360;
+                            if(String.valueOf(raI).length() < 4)
+                                ra += "0";
+                            if(Math.signum(decI) == -1)
+                            {
+                                decI *= -1;
+                                if(String.valueOf(decI).length() < 4)
+                                    dec += "-0";
+                                dec += decI.toString();
+                            }
+                            else
+                            {
+                                if(String.valueOf(decI).length() < 4)
+                                    dec += "0";
+                                dec += decI.toString();
+                            }
+                            ra += raI.toString();
+                            val = ra + ";" + dec;
+                            new Thread(new OutThread()).start();
 
-                /*String coordsVet[] = coords.split(" ");
-                tvSaidaTeste.setText(coordsVet[0]);*/
-                /*try {
-                    val = "090-090-1";
-                    new Thread(new OutThread()).start();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
     }
 
-    private void getCoords(String corpo)
+    private void getCoords(String corpo, final VolleyCallback callback)
     {
         tvSaidaTeste.setText("");
         String url = "http://host-python.herokuapp.com/astropy/" + corpo;
@@ -150,7 +171,7 @@ public class ControlesActivity extends AppCompatActivity {
             request = new StringRequest (Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    tvSaidaTeste.setText(response);
+                    callback.onSuccess(response);
                 }
             }, new Response.ErrorListener() {
                 @Override

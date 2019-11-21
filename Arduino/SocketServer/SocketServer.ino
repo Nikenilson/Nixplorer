@@ -3,7 +3,8 @@
 #include <Stepper.h>
  
 const int stepsPerRevolution = 4096;
-Stepper myStepper(stepsPerRevolution, 4,6,5,7);
+Stepper rightAscension(stepsPerRevolution, 4,6,5,7);
+Stepper declination(stepsPerRevolution, 10,12,11,13);
 SoftwareSerial Serial1(8,9);
 char ssid[] = "Gabriel";
 char pass[] = "12345678";
@@ -13,8 +14,8 @@ WiFiEspServer server(80);
 char buf[10] = {0};
 
 void setup() {
-  myStepper.setSpeed(1); //VELOCIDADE DO MOTOR
-  
+  rightAscension.setSpeed(1); //VELOCIDADE DO MOTOR
+  declination.setSpeed(1);
   Serial.begin(115200);  // porta de debug
   Serial1.begin(9600);
   WiFi.init(&Serial1);
@@ -41,40 +42,44 @@ void loop() {
       if (client.available()){
         char c = client.read();
         buf[i] = c;
-        if (strcmp("\r\n\r\n", buf) == 0){
+        i++;
+        if (strcmp("\r\n", buf) == 0){
           Serial.println("Fechando"); 
           break;
         }
 
         if (i == 9){
-          char delimiter = '-';
-          char* vet = strtok(buf, &delimiter);
-          Serial.println(vet[0]);
-          //efeito1();
-          //reset
+          char* vet = strtok(buf, ";");
           i = 0;
-          Serial.println(buf);
-          Serial.println(" Efeito 1");
-        }
-        if (strcmp("OFF", buf) == 0){
-          digitalWrite(13, LOW);
-          //reset
+          while(vet != NULL ) {
+            int coord = atoi(vet);
+            Serial.println(coord);
+            if(i == 0)
+              moverRA(coord);
+            else if (i == 1)
+              moverDEC(coord);
+            vet = strtok(NULL, ";");
+            i++;
+          }
+          for(i = 0; i < strlen(buf); i++)
+            buf[i] = 0;
           i = 0;
-          Serial.println(" Ligado");
         }
-        
-        
       }
-    } // while
+    }
     client.stop();
     Serial.println("Desconectado");
   }
 }
 
-void efeito1(int graus)
+void moverRA(int passos)
 {
-  int passos = graus*2048/360;
-  myStepper.step(passos);
+  rightAscension.step(passos);
+}
+
+void moverDEC(int passos)
+{
+  declination.step(passos);
 }
 
 
