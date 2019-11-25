@@ -48,6 +48,28 @@ void loop() {
           break;
         }
 
+        if(i == 5)
+        {
+          char* vet = strtok(buf, ";");
+          int coord = atoi(vet);
+          Serial.println(coord);
+          if(coord == 1)
+          {
+             vet = strtok(NULL, ";");
+             coord = atoi(vet);
+             moverDEC(coord);
+          }
+          else
+          {
+             vet = strtok(NULL, ";");
+             coord = atoi(vet);
+             moverRA(coord);
+          }
+          for(i = 0; i < strlen(buf); i++)
+            buf[i] = 0;
+          i = 0;
+        }
+        
         if (i == 9){
           char* vet = strtok(buf, ";");
           i = 0;

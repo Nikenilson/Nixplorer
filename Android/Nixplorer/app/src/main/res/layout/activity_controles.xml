@@ -113,11 +113,13 @@
                     android:layout_height="wrap_content" >
 
                     <Button
+                        android:id="@+id/btnEsquerda"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Esquerda" />
 
                     <Button
+                        android:id="@+id/btnDireita"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Direita" />
@@ -142,11 +144,13 @@
                     android:layout_height="wrap_content" >
 
                     <Button
+                        android:id="@+id/btnCima"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Cima" />
 
                     <Button
+                        android:id="@+id/btnBaixo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Baixo" />

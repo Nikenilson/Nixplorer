@@ -39,7 +39,7 @@ import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 
 public class ControlesActivity extends AppCompatActivity {
-    Button btnAjustar, btnConectar, btnDesconectar;
+    Button btnAjustar, btnConectar, btnDesconectar, btnCima, btnBaixo, btnEsquerda, btnDireita;
     EditText edtIp, edtPorta;
     Spinner spPlanetas, spGrausH, spGrausV;
     TextView tvSaidaTeste;
@@ -65,6 +65,10 @@ public class ControlesActivity extends AppCompatActivity {
         btnAjustar = findViewById(R.id.btnAjustar);
         btnConectar = findViewById(R.id.btnConectar);
         btnDesconectar = findViewById(R.id.btnDesconectar);
+        btnCima = findViewById(R.id.btnCima);
+        btnBaixo = findViewById(R.id.btnBaixo);
+        btnEsquerda = findViewById(R.id.btnEsquerda);
+        btnDireita = findViewById(R.id.btnDireita);
         edtIp = findViewById(R.id.edtIp);
         edtPorta = findViewById(R.id.edtPorta);
         tvSaidaTeste = findViewById(R.id.tvSaidaTeste);
@@ -157,6 +161,70 @@ public class ControlesActivity extends AppCompatActivity {
                         }
                     }
                 });
+            }
+        });
+
+        btnCima.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if(spGrausV.getSelectedItem().toString() == "10º")
+                    {
+                        val = "1;057";
+                        new Thread(new OutThread()).start();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        btnBaixo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if(spGrausV.getSelectedItem().toString() == "10º")
+                    {
+                        val = "1;-57";
+                        new Thread(new OutThread()).start();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        btnEsquerda.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if(spGrausH.getSelectedItem().toString() == "10º")
+                    {
+                        val = "0;-57";
+                        new Thread(new OutThread()).start();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        btnDireita.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if(spGrausH.getSelectedItem().toString() == "10º")
+                    {
+                        val = "0;057";
+                        new Thread(new OutThread()).start();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
