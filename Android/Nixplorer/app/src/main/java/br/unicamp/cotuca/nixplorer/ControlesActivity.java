@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -39,19 +40,20 @@ import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 
 public class ControlesActivity extends AppCompatActivity {
-    Button btnAjustar, btnConectar, btnDesconectar, btnCima, btnBaixo, btnEsquerda, btnDireita;
-    EditText edtIp, edtPorta;
+    Button btnAjustar, btnConectar, btnCima, btnBaixo, btnEsquerda, btnDireita;
+    EditText edtIp;
     Spinner spPlanetas, spGrausH, spGrausV;
     TextView tvSaidaTeste;
 
     private Socket socket = null;
     private static int SERVERPORT = 80;
-    private static String SERVER_IP = "192.168.0.92";
+    private static String SERVER_IP = "192.168.43.99";
     boolean  isRunning = false;
     private PrintWriter out;
     private BufferedReader input;
     private String val = "";
     RequestQueue queue;
+    private boolean conectado = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,13 +66,11 @@ public class ControlesActivity extends AppCompatActivity {
         spGrausV = findViewById(R.id.spGrausV);
         btnAjustar = findViewById(R.id.btnAjustar);
         btnConectar = findViewById(R.id.btnConectar);
-        btnDesconectar = findViewById(R.id.btnDesconectar);
         btnCima = findViewById(R.id.btnCima);
         btnBaixo = findViewById(R.id.btnBaixo);
         btnEsquerda = findViewById(R.id.btnEsquerda);
         btnDireita = findViewById(R.id.btnDireita);
         edtIp = findViewById(R.id.edtIp);
-        edtPorta = findViewById(R.id.edtPorta);
         tvSaidaTeste = findViewById(R.id.tvSaidaTeste);
 
         String[] arraySpinnerPlanetas = new String[] { "Jupiter","Lua", "M42" };
@@ -92,34 +92,28 @@ public class ControlesActivity extends AppCompatActivity {
         spGrausH.setAdapter(adapter2);
         spGrausV.setAdapter(adapter3);
 
+        if (socket != null && !socket.isClosed()) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        new Thread(new ClientThread()).start();
         btnConectar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!edtIp.getText().toString().trim().isEmpty()) {
                     SERVER_IP = edtIp.getText().toString().trim();
-                    SERVERPORT = Integer.parseInt(edtPorta.getText().toString().trim());
                 }
                 if (socket != null && !socket.isClosed()) {
                     try {
                         socket.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
                 new Thread(new ClientThread()).start();
-            }
-        });
-
-        btnDesconectar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    val = "\r\n";
-                    new Thread(new OutThread()).start();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
         });
 
@@ -127,55 +121,65 @@ public class ControlesActivity extends AppCompatActivity {
         btnAjustar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getCoords(spPlanetas.getSelectedItem().toString(), new VolleyCallback() {
-                    @Override
-                    public void onSuccess(String result) {
-                        String coordsVet[] = result.split(" ");
-                        Integer c1 = Math.round(Float.parseFloat(coordsVet[0]));
-                        Integer c2 = Math.round(Float.parseFloat(coordsVet[1]));
-                        try {
-                            String ra = "", dec = "";
-                            Integer raI = (c1*2048)/360;
-                            Integer decI = (c2*2048)/360;
-                            if(String.valueOf(raI).length() < 4)
-                                ra += "0";
-                            if(Math.signum(decI) == -1)
-                            {
-                                decI *= -1;
-                                if(String.valueOf(decI).length() < 4)
-                                    dec += "-0";
-                                dec += decI.toString();
-                            }
-                            else
-                            {
-                                if(String.valueOf(decI).length() < 4)
-                                    dec += "0";
-                                dec += decI.toString();
-                            }
-                            ra += raI.toString();
-                            val = ra + ";" + dec;
-                            new Thread(new OutThread()).start();
+                if(!conectado)
+                    Toast.makeText(getApplicationContext(), "Conecte-se ao sistema!", Toast.LENGTH_SHORT).show();
+                else
+                {
+                    getCoords(spPlanetas.getSelectedItem().toString(), new VolleyCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            String coordsVet[] = result.split(" ");
+                            Integer c1 = Math.round(Float.parseFloat(coordsVet[0]));
+                            Integer c2 = Math.round(Float.parseFloat(coordsVet[1]));
+                            try {
+                                String ra = "", dec = "";
+                                Integer raI = (c1*2048)/360;
+                                Integer decI = (c2*2048)/360;
+                                if(String.valueOf(raI).length() < 4)
+                                    ra += "0";
+                                if(Math.signum(decI) == -1)
+                                {
+                                    decI *= -1;
+                                    if(String.valueOf(decI).length() < 4)
+                                        dec += "-0";
+                                    dec += decI.toString();
+                                }
+                                else
+                                {
+                                    if(String.valueOf(decI).length() < 4)
+                                        dec += "0";
+                                    dec += decI.toString();
+                                }
+                                ra += raI.toString();
+                                val = ra + ";" + dec;
+                                new Thread(new OutThread()).start();
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            } catch (Exception e) {
+                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
 
         btnCima.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if(spGrausV.getSelectedItem().toString() == "10º")
-                    {
-                        val = "1;057";
-                        new Thread(new OutThread()).start();
-                    }
+                if(!conectado)
+                    Toast.makeText(getApplicationContext(), "Conecte-se ao sistema!", Toast.LENGTH_SHORT).show();
+                else
+                {
+                    try {
+                        if(spGrausV.getSelectedItem().toString() == "10º")
+                        {
+                            val = "1;057";
+                            new Thread(new OutThread()).start();
+                        }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -183,15 +187,18 @@ public class ControlesActivity extends AppCompatActivity {
         btnBaixo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if(spGrausV.getSelectedItem().toString() == "10º")
-                    {
-                        val = "1;-57";
-                        new Thread(new OutThread()).start();
-                    }
+                if(!conectado)
+                    Toast.makeText(getApplicationContext(), "Conecte-se ao sistema!", Toast.LENGTH_SHORT).show();
+                else {
+                    try {
+                        if (spGrausV.getSelectedItem().toString() == "10º") {
+                            val = "1;-57";
+                            new Thread(new OutThread()).start();
+                        }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -199,15 +206,18 @@ public class ControlesActivity extends AppCompatActivity {
         btnEsquerda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if(spGrausH.getSelectedItem().toString() == "10º")
-                    {
-                        val = "0;-57";
-                        new Thread(new OutThread()).start();
-                    }
+                if(!conectado)
+                    Toast.makeText(getApplicationContext(), "Conecte-se ao sistema!", Toast.LENGTH_SHORT).show();
+                else {
+                    try {
+                        if (spGrausH.getSelectedItem().toString() == "10º") {
+                            val = "0;-57";
+                            new Thread(new OutThread()).start();
+                        }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -215,15 +225,18 @@ public class ControlesActivity extends AppCompatActivity {
         btnDireita.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if(spGrausH.getSelectedItem().toString() == "10º")
-                    {
-                        val = "0;057";
-                        new Thread(new OutThread()).start();
-                    }
+                if(!conectado)
+                    Toast.makeText(getApplicationContext(), "Conecte-se ao sistema!", Toast.LENGTH_SHORT).show();
+                else {
+                    try {
+                        if (spGrausH.getSelectedItem().toString() == "10º") {
+                            val = "0;057";
+                            new Thread(new OutThread()).start();
+                        }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -248,7 +261,7 @@ public class ControlesActivity extends AppCompatActivity {
                 }
             });
         }catch (Exception ex){
-            Log.e("Mensagem: ", ex.getMessage() + " AQUI!");
+            Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
         queue.add(request);
     }
@@ -264,9 +277,18 @@ public class ControlesActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id != R.id.action_info)
         {
+            if(conectado)
+            {
+                if (socket != null && !socket.isClosed()) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
             Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
             startActivityForResult(myIntent, 0);
-            return true;
         }
         return true;
     }
@@ -285,11 +307,10 @@ public class ControlesActivity extends AppCompatActivity {
                         true);
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 new Thread(new OutThread()).start();
-                new Thread(new Thread2()).start();
             } catch (UnknownHostException e1) {
-                e1.printStackTrace();
+                Toast.makeText(getApplicationContext(), e1.getMessage(), Toast.LENGTH_SHORT).show();
             } catch (IOException e1) {
-                e1.printStackTrace();
+                Toast.makeText(getApplicationContext(), e1.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -299,27 +320,7 @@ public class ControlesActivity extends AppCompatActivity {
         public void run() {
             out.write(val);
             out.flush();
-        }
-    }
-
-    private class Thread2 implements Runnable {
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    final String message = input.readLine();
-                    if (message != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //response.setText("client: " + message + "\n");
-                            }
-                        });
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            conectado = true;
         }
     }
 }
