@@ -1,6 +1,16 @@
-public class Tree
+package br.unicamp.cotuca.nixplorer.arvore;
+
+public class Arvore
 {
 	NoArvore raiz;
+
+	public NoArvore getRaiz() {
+		return raiz;
+	}
+
+	public void setRaiz(NoArvore raiz) {
+		this.raiz = raiz;
+	}
 
 	public void inserirCoordenada(Coordenada d) throws Exception
 	{
@@ -9,9 +19,9 @@ public class Tree
 		else
 		{
 			/*if()
-				throw new Exception("Coordenada já existente");*/
+				throw new Exception("Coordenada jï¿½ existente");*/
 			//else
-				inserirNoArvore(raiz, d);
+				raiz = inserirNoArvore(raiz, d);
 		}
 	}
 
@@ -55,8 +65,7 @@ public class Tree
 		    atual.direita = inserirNoArvore(atual.direita, coord);
 		}
 
-    return atual;
-
+    	return atual;
 	}
 
 	private NoArvore removerNoArvore(NoArvore atual, Coordenada coord)
@@ -89,8 +98,7 @@ public class Tree
 		else if (coord.compareTo(atual.coord) > 0 )
 		 	atual.direita = removerNoArvore(atual.direita, coord);
 
-    return atual;
-
+    	return atual;
 	}
 
 	private Coordenada preocuraMenorCoordenada(NoArvore atual) {
@@ -98,4 +106,20 @@ public class Tree
 	    //Se a esquerda for nula ele eh o menor no
 	}
 
+	public NoArvore procurarNo(NoArvore raiz, String nome)
+	{
+		if(raiz != null){
+			if(raiz.getCoord().getNome().equals(nome)){
+				return raiz;
+			} else {
+				NoArvore foundNode = procurarNo(raiz.getEsquerda(), nome);
+				if(foundNode == null) {
+					foundNode = procurarNo(raiz.getDireita(), nome);
+				}
+				return foundNode;
+			}
+		} else {
+			return null;
+		}
+	}
 }

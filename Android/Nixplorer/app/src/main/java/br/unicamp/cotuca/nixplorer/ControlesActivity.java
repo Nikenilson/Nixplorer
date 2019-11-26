@@ -39,11 +39,14 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 
+import br.unicamp.cotuca.nixplorer.arvore.Arvore;
+import br.unicamp.cotuca.nixplorer.arvore.Coordenada;
+import br.unicamp.cotuca.nixplorer.arvore.NoArvore;
+
 public class ControlesActivity extends AppCompatActivity {
     Button btnAjustar, btnConectar, btnCima, btnBaixo, btnEsquerda, btnDireita;
     EditText edtIp;
     Spinner spPlanetas, spGrausH, spGrausV;
-    TextView tvSaidaTeste;
 
     private Socket socket = null;
     private static int SERVERPORT = 80;
@@ -54,6 +57,8 @@ public class ControlesActivity extends AppCompatActivity {
     private String val = "";
     RequestQueue queue;
     private boolean conectado = false;
+    private int idAtual = 0;
+    private Arvore coordenadas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +76,9 @@ public class ControlesActivity extends AppCompatActivity {
         btnEsquerda = findViewById(R.id.btnEsquerda);
         btnDireita = findViewById(R.id.btnDireita);
         edtIp = findViewById(R.id.edtIp);
-        tvSaidaTeste = findViewById(R.id.tvSaidaTeste);
 
-        String[] arraySpinnerPlanetas = new String[] { "Jupiter","Lua", "M42" };
+        coordenadas = new Arvore();
+        String[] arraySpinnerPlanetas = new String[] { "M31", "Jupiter", "M42" };
         String[] arraySpinnerGrausH = new String[] { "Graus","10º" };
         String[] arraySpinnerGrausV = new String[] { "Graus","10º" };
 
@@ -125,40 +130,56 @@ public class ControlesActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Conecte-se ao sistema!", Toast.LENGTH_SHORT).show();
                 else
                 {
-                    getCoords(spPlanetas.getSelectedItem().toString(), new VolleyCallback() {
-                        @Override
-                        public void onSuccess(String result) {
-                            String coordsVet[] = result.split(" ");
-                            Integer c1 = Math.round(Float.parseFloat(coordsVet[0]));
-                            Integer c2 = Math.round(Float.parseFloat(coordsVet[1]));
-                            try {
-                                String ra = "", dec = "";
-                                Integer raI = (c1*2048)/360;
-                                Integer decI = (c2*2048)/360;
-                                if(String.valueOf(raI).length() < 4)
-                                    ra += "0";
-                                if(Math.signum(decI) == -1)
-                                {
-                                    decI *= -1;
-                                    if(String.valueOf(decI).length() < 4)
-                                        dec += "-0";
-                                    dec += decI.toString();
-                                }
-                                else
-                                {
-                                    if(String.valueOf(decI).length() < 4)
-                                        dec += "0";
-                                    dec += decI.toString();
-                                }
-                                ra += raI.toString();
-                                val = ra + ";" + dec;
-                                new Thread(new OutThread()).start();
-
-                            } catch (Exception e) {
-                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                    NoArvore proc;
+                    if((proc = coordenadas.procurarNo(coordenadas.getRaiz(), spPlanetas.getSelectedItem().toString())) != null)
+                    {
+                        try {
+                            val = proc.getCoord().getRa() + ";" + proc.getCoord().getDec();
+                            new Thread(new OutThread()).start();
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                    });
+
+                    }
+                    else
+                    {
+                        getCoords(spPlanetas.getSelectedItem().toString(), new VolleyCallback() {
+                            @Override
+                            public void onSuccess(String result) {
+                                String coordsVet[] = result.split(" ");
+                                Integer c1 = Math.round(Float.parseFloat(coordsVet[0]));
+                                Integer c2 = Math.round(Float.parseFloat(coordsVet[1]));
+                                try {
+                                    String ra = "", dec = "";
+                                    Integer raI = (c1*2048)/360;
+                                    Integer decI = (c2*2048)/360;
+                                    if(String.valueOf(raI).length() < 4)
+                                        ra += "0";
+                                    if(Math.signum(decI) == -1)
+                                    {
+                                        decI *= -1;
+                                        if(String.valueOf(decI).length() < 4)
+                                            dec += "-0";
+                                        dec += decI.toString();
+                                    }
+                                    else
+                                    {
+                                        if(String.valueOf(decI).length() < 4)
+                                            dec += "0";
+                                        dec += decI.toString();
+                                    }
+                                    ra += raI.toString();
+                                    val = ra + ";" + dec;
+                                    coordenadas.inserirCoordenada(new Coordenada(spPlanetas.getSelectedItem().toString(), raI, decI, idAtual));
+                                    idAtual++;
+                                    new Thread(new OutThread()).start();
+
+                                } catch (Exception e) {
+                                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -173,7 +194,7 @@ public class ControlesActivity extends AppCompatActivity {
                     try {
                         if(spGrausV.getSelectedItem().toString() == "10º")
                         {
-                            val = "1;057";
+                            val = "1;-57";
                             new Thread(new OutThread()).start();
                         }
 
@@ -192,7 +213,7 @@ public class ControlesActivity extends AppCompatActivity {
                 else {
                     try {
                         if (spGrausV.getSelectedItem().toString() == "10º") {
-                            val = "1;-57";
+                            val = "1;057";
                             new Thread(new OutThread()).start();
                         }
 
@@ -244,7 +265,6 @@ public class ControlesActivity extends AppCompatActivity {
 
     private void getCoords(String corpo, final VolleyCallback callback)
     {
-        tvSaidaTeste.setText("");
         String url = "http://host-python.herokuapp.com/astropy/" + corpo;
         StringRequest request = null;
 
